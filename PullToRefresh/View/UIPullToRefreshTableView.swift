@@ -13,6 +13,8 @@ class UIPullToRefreshTableView: UITableView {
     let refreshHoldHeight: CGFloat = 60
     let refreshTriggerHeight: CGFloat = 75
     
+    var loadingHandler: (() -> Void)?
+    
     private var progress: CGFloat = 0
     private var isLoading = false
     
@@ -34,6 +36,14 @@ class UIPullToRefreshTableView: UITableView {
         commonInit()
     }
     
+    // MARK: - Interface
+    
+    func loadingComplete() {
+        isLoading = false
+        isScrollEnabled = true
+        self.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
+    }
+    
     // MARK: - KVO
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -48,21 +58,22 @@ class UIPullToRefreshTableView: UITableView {
         } else {
             if !isLoading && progress >= 1.0 {
                 isLoading = true
-                UIView.animate(withDuration: 0.5, animations: { [weak self] in
+                isScrollEnabled = false
+                
+                spinningRefreshIndicator()
+                
+                UIView.animate(withDuration: 0.3, animations: { [weak self] in
                     if let weakSelf = self {
                         weakSelf.contentInset = UIEdgeInsetsMake(weakSelf.contentInset.top + weakSelf.refreshHoldHeight, 0, 0, 0)
                     }
                 }, completion: { [weak self] completion in
-                    if let weakSelf = self {
-                        weakSelf.isLoading = false
-                        weakSelf.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
-                    }
+                    self?.loadingHandler?()
                 })
             }
         }
     }
     
-    // MARK: - Internal
+    // MARK: - Internal - Init
     
     private func commonInit() {
         addSubview(refreshView)
@@ -93,6 +104,8 @@ class UIPullToRefreshTableView: UITableView {
         return layer
     }
     
+    // MARK: - Internal - Graphics
+    
     private func updateRefreshProgress(_ newProgress: CGFloat) {
         let layerAnim = CABasicAnimation(keyPath: "strokeEnd")
         layerAnim.fromValue = progress
@@ -104,5 +117,16 @@ class UIPullToRefreshTableView: UITableView {
         
         shapeLayer.removeAllAnimations()
         shapeLayer.add(layerAnim, forKey: "layerAnim")
+    }
+    
+    private func spinningRefreshIndicator() {
+//        let layerAnim = CABasicAnimation(keyPath: "strokeEnd")
+//        layerAnim.fromValue = 0.2
+//        layerAnim.toValue = 1.1
+//        layerAnim.fillMode = kCAFillModeForwards
+//        layerAnim.isRemovedOnCompletion = false
+//        
+//        shapeLayer.removeAllAnimations()
+//        shapeLayer.add(layerAnim, forKey: "layerAnim")
     }
 }
