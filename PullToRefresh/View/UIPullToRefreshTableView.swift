@@ -9,7 +9,11 @@
 import UIKit
 
 class UIPullToRefreshTableView: UITableView {
+    
     let refreshHoldHeight: CGFloat = 60
+    let refreshTriggerHeight: CGFloat = 75
+    
+    private var progress: CGFloat = 0
     
     private lazy var refreshView: UIView = {
         return initRefreshView()
@@ -31,16 +35,18 @@ class UIPullToRefreshTableView: UITableView {
     
     // MARK: - KVO
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        guard keyPath == "contentOffset" else {
+        guard keyPath == "contentOffset", contentOffset.y < 0 else {
             return
         }
         
-        NSLog("호엣")
+        let progress = abs(contentOffset.y) / refreshTriggerHeight
+        updateRefreshProgress(progress)
     }
     
     // MARK: - Internal
     
     private func commonInit() {
+        addSubview(refreshView)
         addObserver(self, forKeyPath: "contentOffset", options: .new, context: nil)
     }
     
@@ -60,9 +66,24 @@ class UIPullToRefreshTableView: UITableView {
         let layer = CAShapeLayer()
         layer.path = circlePath.cgPath
         layer.fillColor = UIColor.lightGray.cgColor
-        layer.strokeColor = UIColor.red.cgColor
         layer.lineWidth = 3
+        layer.strokeColor = UIColor.red.cgColor
+        layer.strokeStart = 0.0
+        layer.strokeEnd = 0.0
         
         return layer
+    }
+    
+    private func updateRefreshProgress(_ newProgress: CGFloat) {
+        let layerAnim = CABasicAnimation(keyPath: "strokeEnd")
+        layerAnim.fromValue = progress
+        layerAnim.toValue = newProgress
+        layerAnim.fillMode = kCAFillModeForwards
+        layerAnim.isRemovedOnCompletion = false
+        
+        progress = newProgress
+        
+        shapeLayer.removeAllAnimations()
+        shapeLayer.add(layerAnim, forKey: "layerAnim")
     }
 }

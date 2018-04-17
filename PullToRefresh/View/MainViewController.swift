@@ -25,9 +25,6 @@ class MainViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.reloadData()
-        tableView.addPullToRefresh {
-            
-        }
     }
 }
 
