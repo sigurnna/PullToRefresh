@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		630549282085C3AD002599F2 /* UIPullToRefreshTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 630549272085C3AD002599F2 /* UIPullToRefreshTableView.swift */; };
 		63BCF9F420859467008A374B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63BCF9F320859467008A374B /* AppDelegate.swift */; };
 		63BCF9F620859467008A374B /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63BCF9F520859467008A374B /* MainViewController.swift */; };
 		63BCF9F920859467008A374B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 63BCF9F720859467008A374B /* Main.storyboard */; };
 		63BCF9FB20859468008A374B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63BCF9FA20859468008A374B /* Assets.xcassets */; };
 		63BCF9FE20859468008A374B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 63BCF9FC20859468008A374B /* LaunchScreen.storyboard */; };
 		63BCFA0920859468008A374B /* PullToRefreshTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63BCFA0820859468008A374B /* PullToRefreshTests.swift */; };
-		63BCFA14208594CB008A374B /* UITableView+PullToRefresh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63BCFA13208594CB008A374B /* UITableView+PullToRefresh.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,6 +27,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		630549272085C3AD002599F2 /* UIPullToRefreshTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIPullToRefreshTableView.swift; sourceTree = "<group>"; };
 		63BCF9F020859467008A374B /* PullToRefresh.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PullToRefresh.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		63BCF9F320859467008A374B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		63BCF9F520859467008A374B /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
@@ -37,7 +38,6 @@
 		63BCFA0420859468008A374B /* PullToRefreshTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PullToRefreshTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		63BCFA0820859468008A374B /* PullToRefreshTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullToRefreshTests.swift; sourceTree = "<group>"; };
 		63BCFA0A20859468008A374B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		63BCFA13208594CB008A374B /* UITableView+PullToRefresh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+PullToRefresh.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,7 +79,6 @@
 		63BCF9F220859467008A374B /* PullToRefresh */ = {
 			isa = PBXGroup;
 			children = (
-				63BCFA1620859608008A374B /* Extension */,
 				63BCFA15208594D9008A374B /* View */,
 				63BCF9FF20859468008A374B /* Info.plist */,
 				63BCF9F320859467008A374B /* AppDelegate.swift */,
@@ -100,19 +99,12 @@
 		63BCFA15208594D9008A374B /* View */ = {
 			isa = PBXGroup;
 			children = (
+				630549272085C3AD002599F2 /* UIPullToRefreshTableView.swift */,
 				63BCF9FC20859468008A374B /* LaunchScreen.storyboard */,
 				63BCF9F720859467008A374B /* Main.storyboard */,
 				63BCF9F520859467008A374B /* MainViewController.swift */,
 			);
 			path = View;
-			sourceTree = "<group>";
-		};
-		63BCFA1620859608008A374B /* Extension */ = {
-			isa = PBXGroup;
-			children = (
-				63BCFA13208594CB008A374B /* UITableView+PullToRefresh.swift */,
-			);
-			path = Extension;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -217,8 +209,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				63BCF9F620859467008A374B /* MainViewController.swift in Sources */,
+				630549282085C3AD002599F2 /* UIPullToRefreshTableView.swift in Sources */,
 				63BCF9F420859467008A374B /* AppDelegate.swift in Sources */,
-				63BCFA14208594CB008A374B /* UITableView+PullToRefresh.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
