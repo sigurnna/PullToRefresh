@@ -14,6 +14,7 @@ class UIPullToRefreshTableView: UITableView {
     let refreshTriggerHeight: CGFloat = 75
     
     private var progress: CGFloat = 0
+    private var isLoading = false
     
     private lazy var refreshView: UIView = {
         return initRefreshView()
@@ -34,13 +35,31 @@ class UIPullToRefreshTableView: UITableView {
     }
     
     // MARK: - KVO
+    
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         guard keyPath == "contentOffset", contentOffset.y < 0 else {
             return
         }
         
         let progress = abs(contentOffset.y) / refreshTriggerHeight
-        updateRefreshProgress(progress)
+        
+        if self.isDragging {
+            updateRefreshProgress(progress)
+        } else {
+            if !isLoading && progress >= 1.0 {
+                isLoading = true
+                UIView.animate(withDuration: 0.5, animations: { [weak self] in
+                    if let weakSelf = self {
+                        weakSelf.contentInset = UIEdgeInsetsMake(weakSelf.contentInset.top + weakSelf.refreshHoldHeight, 0, 0, 0)
+                    }
+                }, completion: { [weak self] completion in
+                    if let weakSelf = self {
+                        weakSelf.isLoading = false
+                        weakSelf.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
+                    }
+                })
+            }
+        }
     }
     
     // MARK: - Internal
