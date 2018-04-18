@@ -2,16 +2,16 @@
 //  UIPullToRefreshTableView.swift
 //  PullToRefresh
 //
-//  Created by 이승준 on 2018. 4. 17..
+//  Created by 이승준 on 2018. 4. 18..
 //  Copyright © 2018년 seungjun. All rights reserved.
 //
 
 import UIKit
 
 class UIPullToRefreshTableView: UITableView {
-    
+
     let refreshHoldHeight: CGFloat = 60
-    let refreshTriggerHeight: CGFloat = 60
+    let refreshTriggerHeight: CGFloat = 75
     
     // Accessible Properties
     var loadingHandler: (() -> Void)?
@@ -79,6 +79,8 @@ class UIPullToRefreshTableView: UITableView {
             if progress >= 1.0 {
                 isTriggered = true
                 shapeLayer.strokeColor = spinningColor.cgColor
+            } else {
+                isTriggered = false
             }
         } else {
             if !isLoading && isTriggered {
@@ -90,11 +92,11 @@ class UIPullToRefreshTableView: UITableView {
                     if let weakSelf = self {
                         weakSelf.contentInset = UIEdgeInsetsMake(weakSelf.contentInset.top + weakSelf.refreshHoldHeight, 0, 0, 0)
                     }
-                }, completion: { [weak self] completion in
-                    if let weakSelf = self {
-                        weakSelf.spinningRefreshIndicator()
-                        weakSelf.loadingHandler?()
-                    }
+                    }, completion: { [weak self] completion in
+                        if let weakSelf = self {
+                            weakSelf.spinningRefreshIndicator()
+                            weakSelf.loadingHandler?()
+                        }
                 })
             }
         }
@@ -107,7 +109,7 @@ class UIPullToRefreshTableView: UITableView {
         view.frame = CGRect(x: 0, y: -refreshHoldHeight, width: self.frame.size.width, height: refreshHoldHeight)
         view.backgroundColor = bgColor
         view.layer.addSublayer(shapeLayer)
-
+        
         return view
     }
     
