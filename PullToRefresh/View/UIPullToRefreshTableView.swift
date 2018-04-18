@@ -75,9 +75,8 @@ class UIPullToRefreshTableView: UITableView {
         let progress = abs(contentOffset.y) / refreshTriggerHeight
         
         if self.isDragging {
-            if 0.0 ..< 1.0 ~= progress {
-                updateRefreshProgress(progress)
-            } else {
+            updateRefreshProgress(progress)
+            if progress >= 1.0 {
                 isTriggered = true
                 shapeLayer.strokeColor = spinningColor.cgColor
             }

@@ -16,11 +16,11 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        strings.append("텍스트1")
-        strings.append("텍스트2")
-        strings.append("텍스트3")
-        strings.append("텍스트4")
-        strings.append("텍스트5")
+        strings.append("test text 1")
+        strings.append("test text 2")
+        strings.append("test text 3")
+        strings.append("test text 4")
+        strings.append("test text 5")
         
         tableView.delegate = self
         tableView.dataSource = self
