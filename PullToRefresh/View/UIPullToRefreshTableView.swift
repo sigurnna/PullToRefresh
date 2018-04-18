@@ -75,7 +75,7 @@ class UIPullToRefreshTableView: UITableView {
         let progress = abs(contentOffset.y) / refreshTriggerHeight
         
         if self.isDragging {
-            if progress < 1.0 {
+            if 0.0 ..< 1.0 ~= progress {
                 updateRefreshProgress(progress)
             } else {
                 isTriggered = true
