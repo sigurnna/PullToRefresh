@@ -1,15 +1,15 @@
 //
-//  PullToRefreshTests.swift
-//  PullToRefreshTests
+//  UIPullToRefreshTableViewTests.swift
+//  UIPullToRefreshTableViewTests
 //
-//  Created by 이승준 on 2018. 4. 17..
+//  Created by 이승준 on 2018. 4. 18..
 //  Copyright © 2018년 seungjun. All rights reserved.
 //
 
 import XCTest
-@testable import PullToRefresh
+@testable import UIPullToRefreshTableView
 
-class PullToRefreshTests: XCTestCase {
+class UIPullToRefreshTableViewTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
