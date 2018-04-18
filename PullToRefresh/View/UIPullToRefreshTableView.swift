@@ -19,6 +19,7 @@ class UIPullToRefreshTableView: UITableView {
     var loadingColor = UIColor.gray
     var spinningColor = UIColor.red
     
+    private let circleRadius: CGFloat = 15
     private var progress: CGFloat = 0
     private var isLoading = false
     private var isTriggered = false
@@ -41,6 +42,10 @@ class UIPullToRefreshTableView: UITableView {
         commonInit()
     }
     
+    deinit {
+        removeObserver(self, forKeyPath: "contentOffset")
+    }
+    
     private func commonInit() {
         addSubview(refreshView)
         addObserver(self, forKeyPath: "contentOffset", options: .new, context: nil)
@@ -53,6 +58,7 @@ class UIPullToRefreshTableView: UITableView {
         isScrollEnabled = true
         
         shapeLayer.removeAnimation(forKey: "rotateAnim")
+        shapeLayer.path = circlePath(endAngle: CGFloat(Double.pi * 2.0)).cgPath
         
         UIView.animate(withDuration: 0.3) { [weak self] in
             self?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
@@ -107,12 +113,10 @@ class UIPullToRefreshTableView: UITableView {
     }
     
     private func initShapeLayer() -> CAShapeLayer {
-        let radius: CGFloat = 15.0
-        let circlePath = UIBezierPath(arcCenter: CGPoint(x: radius, y: radius), radius: radius, startAngle: 0, endAngle: CGFloat(Double.pi * 2.0), clockwise: true)
-        
+        let path = circlePath(endAngle: CGFloat(Double.pi * 2.0))
         let layer = CAShapeLayer()
-        layer.frame = CGRect(x: (self.frame.width / 2) - radius, y: (refreshHoldHeight / 2) - radius, width: radius * 2, height: radius * 2)
-        layer.path = circlePath.cgPath
+        layer.frame = CGRect(x: (self.frame.width / 2) - circleRadius, y: (refreshHoldHeight / 2) - circleRadius, width: circleRadius * 2, height: circleRadius * 2)
+        layer.path = path.cgPath
         layer.fillColor = bgColor.cgColor
         layer.lineWidth = 3
         layer.strokeColor = loadingColor.cgColor
@@ -120,6 +124,10 @@ class UIPullToRefreshTableView: UITableView {
         layer.strokeEnd = 0.0
         
         return layer
+    }
+    
+    private func circlePath(endAngle: CGFloat) -> UIBezierPath {
+        return UIBezierPath(arcCenter: CGPoint(x: circleRadius, y: circleRadius), radius: circleRadius, startAngle: 0, endAngle: endAngle, clockwise: true)
     }
     
     // MARK: - Internal - Graphics
@@ -140,16 +148,14 @@ class UIPullToRefreshTableView: UITableView {
     
     private func spinningRefreshIndicator() {
         if shapeLayer.animation(forKey: "rotateAnim") == nil {
-            let radius: CGFloat = 15.0
-            let circlePath = UIBezierPath(arcCenter: CGPoint(x: radius, y: radius), radius: radius, startAngle: 0, endAngle: CGFloat(Double.pi * 1.9), clockwise: true)
-            
+            let path = circlePath(endAngle: CGFloat(Double.pi * 1.9))
             let rotateAnim = CABasicAnimation(keyPath: "transform.rotation.z")
             rotateAnim.fromValue = 0
             rotateAnim.toValue = Double.pi * 2.0
             rotateAnim.duration = 1.0
             rotateAnim.repeatCount = Float.infinity
             
-            shapeLayer.path = circlePath.cgPath
+            shapeLayer.path = path.cgPath
             shapeLayer.add(rotateAnim, forKey: "rotateAnim")
         }
     }
