@@ -36,12 +36,17 @@ class UIPullToRefreshTableView: UITableView {
         commonInit()
     }
     
+    private func commonInit() {
+        addSubview(refreshView)
+        addObserver(self, forKeyPath: "contentOffset", options: .new, context: nil)
+    }
+    
     // MARK: - Interface
     
     func loadingComplete() {
         isLoading = false
         isScrollEnabled = true
-        self.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
+        contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
     }
     
     // MARK: - KVO
@@ -53,6 +58,9 @@ class UIPullToRefreshTableView: UITableView {
         
         let progress = abs(contentOffset.y) / refreshTriggerHeight
         
+        // TODO
+        // progress가 1이되면 rotating 되도록 수정을 해보도록 하자.
+        
         if self.isDragging {
             updateRefreshProgress(progress)
         } else {
@@ -60,25 +68,19 @@ class UIPullToRefreshTableView: UITableView {
                 isLoading = true
                 isScrollEnabled = false
                 
-                spinningRefreshIndicator()
-                
                 UIView.animate(withDuration: 0.3, animations: { [weak self] in
                     if let weakSelf = self {
                         weakSelf.contentInset = UIEdgeInsetsMake(weakSelf.contentInset.top + weakSelf.refreshHoldHeight, 0, 0, 0)
                     }
                 }, completion: { [weak self] completion in
+                    self?.spinningRefreshIndicator()
                     self?.loadingHandler?()
                 })
             }
         }
     }
     
-    // MARK: - Internal - Init
-    
-    private func commonInit() {
-        addSubview(refreshView)
-        addObserver(self, forKeyPath: "contentOffset", options: .new, context: nil)
-    }
+    // MARK: - Internal
     
     private func initRefreshView() -> UIView {
         let view = UIView()
@@ -90,10 +92,11 @@ class UIPullToRefreshTableView: UITableView {
     }
     
     private func initShapeLayer() -> CAShapeLayer {
-        let arcCenter = CGPoint(x: (self.frame.width / 2), y: (refreshHoldHeight / 2))
-        let circlePath = UIBezierPath(arcCenter: arcCenter, radius: 15, startAngle: 0, endAngle: CGFloat(Double.pi * 2), clockwise: true)
+        let radius: CGFloat = 15.0
+        let circlePath = UIBezierPath(arcCenter: CGPoint(x: radius, y: radius), radius: radius, startAngle: 0, endAngle: CGFloat(Double.pi * 1.9), clockwise: true)
         
         let layer = CAShapeLayer()
+        layer.frame = CGRect(x: (self.frame.width / 2) - radius, y: (refreshHoldHeight / 2) - radius, width: radius * 2, height: radius * 2)
         layer.path = circlePath.cgPath
         layer.fillColor = UIColor.lightGray.cgColor
         layer.lineWidth = 3
@@ -120,13 +123,15 @@ class UIPullToRefreshTableView: UITableView {
     }
     
     private func spinningRefreshIndicator() {
-//        let layerAnim = CABasicAnimation(keyPath: "strokeEnd")
-//        layerAnim.fromValue = 0.2
-//        layerAnim.toValue = 1.1
-//        layerAnim.fillMode = kCAFillModeForwards
-//        layerAnim.isRemovedOnCompletion = false
-//        
-//        shapeLayer.removeAllAnimations()
-//        shapeLayer.add(layerAnim, forKey: "layerAnim")
+        let rotateAnim = CABasicAnimation(keyPath: "transform.rotation.z")
+        rotateAnim.fromValue = 0
+        rotateAnim.toValue = Double.pi * 2.0
+        rotateAnim.duration = 1.0
+        rotateAnim.isCumulative = true
+        rotateAnim.repeatCount = Float.infinity
+        //rotateAnim.timingFunction
+        
+        //shapeLayer.removeAllAnimations()
+        shapeLayer.add(rotateAnim, forKey: "rotateAnim")
     }
 }
