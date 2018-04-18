@@ -10,7 +10,7 @@ import UIKit
 
 class MainViewController: UIViewController {
     
-    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var tableView: UIPullToRefreshTableView!
     var strings = [String]()
     
     override func viewDidLoad() {
@@ -25,6 +25,12 @@ class MainViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.reloadData()
+        
+        tableView.loadingHandler = { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
+                self?.tableView.loadingComplete()
+            })
+        }
     }
 }
 

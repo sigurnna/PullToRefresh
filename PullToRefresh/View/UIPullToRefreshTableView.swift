@@ -11,12 +11,18 @@ import UIKit
 class UIPullToRefreshTableView: UITableView {
     
     let refreshHoldHeight: CGFloat = 60
-    let refreshTriggerHeight: CGFloat = 75
+    let refreshTriggerHeight: CGFloat = 60
     
+    // Accessible Properties
     var loadingHandler: (() -> Void)?
+    var bgColor = UIColor.lightGray
+    var loadingColor = UIColor.gray
+    var spinningColor = UIColor.red
     
+    private let circleRadius: CGFloat = 15
     private var progress: CGFloat = 0
     private var isLoading = false
+    private var isTriggered = false
     
     private lazy var refreshView: UIView = {
         return initRefreshView()
@@ -36,12 +42,27 @@ class UIPullToRefreshTableView: UITableView {
         commonInit()
     }
     
+    deinit {
+        removeObserver(self, forKeyPath: "contentOffset")
+    }
+    
+    private func commonInit() {
+        addSubview(refreshView)
+        addObserver(self, forKeyPath: "contentOffset", options: .new, context: nil)
+    }
+    
     // MARK: - Interface
     
     func loadingComplete() {
         isLoading = false
         isScrollEnabled = true
-        self.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
+        
+        shapeLayer.removeAnimation(forKey: "rotateAnim")
+        shapeLayer.path = circlePath(endAngle: CGFloat(Double.pi * 2.0)).cgPath
+        
+        UIView.animate(withDuration: 0.3) { [weak self] in
+            self?.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
+        }
     }
     
     // MARK: - KVO
@@ -54,54 +75,59 @@ class UIPullToRefreshTableView: UITableView {
         let progress = abs(contentOffset.y) / refreshTriggerHeight
         
         if self.isDragging {
-            updateRefreshProgress(progress)
+            if 0.0 ..< 1.0 ~= progress {
+                updateRefreshProgress(progress)
+            } else {
+                isTriggered = true
+                shapeLayer.strokeColor = spinningColor.cgColor
+            }
         } else {
-            if !isLoading && progress >= 1.0 {
+            if !isLoading && isTriggered {
                 isLoading = true
+                isTriggered = false
                 isScrollEnabled = false
-                
-                spinningRefreshIndicator()
                 
                 UIView.animate(withDuration: 0.3, animations: { [weak self] in
                     if let weakSelf = self {
                         weakSelf.contentInset = UIEdgeInsetsMake(weakSelf.contentInset.top + weakSelf.refreshHoldHeight, 0, 0, 0)
                     }
                 }, completion: { [weak self] completion in
-                    self?.loadingHandler?()
+                    if let weakSelf = self {
+                        weakSelf.spinningRefreshIndicator()
+                        weakSelf.loadingHandler?()
+                    }
                 })
             }
         }
     }
     
-    // MARK: - Internal - Init
-    
-    private func commonInit() {
-        addSubview(refreshView)
-        addObserver(self, forKeyPath: "contentOffset", options: .new, context: nil)
-    }
+    // MARK: - Internal
     
     private func initRefreshView() -> UIView {
         let view = UIView()
         view.frame = CGRect(x: 0, y: -refreshHoldHeight, width: self.frame.size.width, height: refreshHoldHeight)
-        view.backgroundColor = UIColor.lightGray
+        view.backgroundColor = bgColor
         view.layer.addSublayer(shapeLayer)
 
         return view
     }
     
     private func initShapeLayer() -> CAShapeLayer {
-        let arcCenter = CGPoint(x: (self.frame.width / 2), y: (refreshHoldHeight / 2))
-        let circlePath = UIBezierPath(arcCenter: arcCenter, radius: 15, startAngle: 0, endAngle: CGFloat(Double.pi * 2), clockwise: true)
-        
+        let path = circlePath(endAngle: CGFloat(Double.pi * 2.0))
         let layer = CAShapeLayer()
-        layer.path = circlePath.cgPath
-        layer.fillColor = UIColor.lightGray.cgColor
+        layer.frame = CGRect(x: (self.frame.width / 2) - circleRadius, y: (refreshHoldHeight / 2) - circleRadius, width: circleRadius * 2, height: circleRadius * 2)
+        layer.path = path.cgPath
+        layer.fillColor = bgColor.cgColor
         layer.lineWidth = 3
-        layer.strokeColor = UIColor.red.cgColor
+        layer.strokeColor = loadingColor.cgColor
         layer.strokeStart = 0.0
         layer.strokeEnd = 0.0
         
         return layer
+    }
+    
+    private func circlePath(endAngle: CGFloat) -> UIBezierPath {
+        return UIBezierPath(arcCenter: CGPoint(x: circleRadius, y: circleRadius), radius: circleRadius, startAngle: 0, endAngle: endAngle, clockwise: true)
     }
     
     // MARK: - Internal - Graphics
@@ -115,18 +141,22 @@ class UIPullToRefreshTableView: UITableView {
         
         progress = newProgress
         
-        shapeLayer.removeAllAnimations()
+        shapeLayer.strokeColor = UIColor.gray.cgColor
+        shapeLayer.removeAnimation(forKey: "layerAnim")
         shapeLayer.add(layerAnim, forKey: "layerAnim")
     }
     
     private func spinningRefreshIndicator() {
-//        let layerAnim = CABasicAnimation(keyPath: "strokeEnd")
-//        layerAnim.fromValue = 0.2
-//        layerAnim.toValue = 1.1
-//        layerAnim.fillMode = kCAFillModeForwards
-//        layerAnim.isRemovedOnCompletion = false
-//        
-//        shapeLayer.removeAllAnimations()
-//        shapeLayer.add(layerAnim, forKey: "layerAnim")
+        if shapeLayer.animation(forKey: "rotateAnim") == nil {
+            let path = circlePath(endAngle: CGFloat(Double.pi * 1.9))
+            let rotateAnim = CABasicAnimation(keyPath: "transform.rotation.z")
+            rotateAnim.fromValue = 0
+            rotateAnim.toValue = Double.pi * 2.0
+            rotateAnim.duration = 1.0
+            rotateAnim.repeatCount = Float.infinity
+            
+            shapeLayer.path = path.cgPath
+            shapeLayer.add(rotateAnim, forKey: "rotateAnim")
+        }
     }
 }
