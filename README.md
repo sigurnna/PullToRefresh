@@ -18,4 +18,7 @@ tableView.loadingHandler = { [weak self] in
 You must call "loadingComplete", otherwise the refresh animation will not end.
 
 # How to install
-writing...
+Edit your Podfile
+```
+pod 'UIPullToRefreshTableView'
+```
